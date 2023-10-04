@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-simple-chart
+  labels:
+    app.kubernetes.io/name: busybox-simple-chart
+    app.kubernetes.io/version: 1.1.3
+    helm.sh/chart: busybox-simple-chart-1.1.3
+    app.kubernetes.io/instance: "release-name"
+    app.kubernetes.io/managed-by: Helm
+  annotations:    
+    ericsson.com/product-name: "Example Product"
+    ericsson.com/product-number: "CXP90001/2"
+    ericsson.com/product-revision: "R2A"
+  namespace: zanttom-ns  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: busybox-simple-chart
+      app.kubernetes.io/instance: "release-name"
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: busybox-simple-chart
+        app.kubernetes.io/version: 1.1.3
+        helm.sh/chart: busybox-simple-chart-1.1.3
+        app.kubernetes.io/instance: "release-name"
+        app.kubernetes.io/managed-by: Helm
+      annotations:        
+        ericsson.com/product-name: "Example Product"
+        ericsson.com/product-number: "CXP90001/2"
+        ericsson.com/product-revision: "R2A"
+    spec:
+      containers:
+      - image: "armdocker.rnd.ericsson.se/dockerhub-ericsson-remote/busybox:1.32.0"
+        imagePullPolicy: IfNotPresent
+        name: waiter
+        env:
+          - name: SECRET_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: login
+          - name: SECRET_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: password
+        args:
+          - /bin/sh
+          - -c
+          - date; echo -e "Before Ready Status"; sleep 10; date; touch /tmp/iamready; echo -e "\nAfter Ready Status"; sleep 360
