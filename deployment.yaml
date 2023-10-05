@@ -14,7 +14,7 @@ metadata:
     ericsson.com/product-revision: "R2A"
   namespace: zanttom-ns  
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: busybox-simple-chart
